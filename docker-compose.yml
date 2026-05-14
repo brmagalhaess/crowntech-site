@@ -8,7 +8,7 @@ services:
     container_name: crowntech-site
     restart: unless-stopped
     ports:
-      - "8081:8081"
+      - "80:80"
 
     # ─── Limites de recursos ────────────────────────────────────────────────
     # Site estático com Nginx consome pouquíssimo recurso.
