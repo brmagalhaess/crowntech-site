@@ -4,10 +4,10 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "${PORT}:${PORT}"
+      - "3001:3001"
     environment:
       - NODE_ENV=production
-      - PORT=${PORT}
+      - PORT=3001
     restart: unless-stopped
     deploy:
       resources:
