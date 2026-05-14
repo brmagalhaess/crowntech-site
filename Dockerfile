@@ -10,8 +10,8 @@ COPY . /usr/share/nginx/html
 # Copia a configuração customizada do Nginx
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Expõe a porta 80
-EXPOSE 80
+# Expõe a porta 8081
+EXPOSE 8081
 
 # Inicia o Nginx em foreground (necessário para Docker)
 CMD ["nginx", "-g", "daemon off;"]
