@@ -1,5 +1,5 @@
 services:
-  crowntech:
+  crowntech-site:
     build:
       context: .
       dockerfile: Dockerfile
