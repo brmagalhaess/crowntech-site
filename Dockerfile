@@ -1,17 +1,28 @@
-# ─── Imagem base: Nginx leve (Alpine Linux) ─────────────────────────────────
-FROM nginx:alpine
+# ─── Etapa 1: Instalar dependências ──────────────────────────────────────────
+FROM node:18-alpine AS deps
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci --only=production
 
-# Remove a página padrão do Nginx
-RUN rm -rf /usr/share/nginx/html/*
+# ─── Etapa 2: Build da aplicação ────────────────────────────────────────────
+FROM node:18-alpine AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN npm run build
 
-# Copia todos os arquivos do site para dentro do container
-COPY . /usr/share/nginx/html
+# ─── Etapa 3: Imagem de produção (leve) ─────────────────────────────────────
+FROM node:18-alpine AS runner
+WORKDIR /app
 
-# Copia a configuração customizada do Nginx
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+ENV NODE_ENV=production
+ENV PORT=3000
 
-# Expõe a porta 8081
-EXPOSE 8081
+# Copia apenas o necessário para rodar
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 
-# Inicia o Nginx em foreground (necessário para Docker)
-CMD ["nginx", "-g", "daemon off;"]
+EXPOSE 3000
+
+CMD ["node", "server.js"]
