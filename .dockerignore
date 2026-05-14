@@ -1,0 +1,22 @@
+# Arquivos e pastas que NÃO devem ir para o container
+
+# Controle de versão
+.git
+.gitignore
+
+# Documentação e configs de dev
+README.md
+*.md
+
+# Configs de editor
+.vscode
+.idea
+*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker (não precisa copiar a si mesmo)
+Dockerfile
+.dockerignore
