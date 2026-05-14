@@ -1,29 +1,18 @@
-# ─── Etapa 1: Instalar dependências ──────────────────────────────────────────
-FROM node:18-alpine AS deps
+FROM node:18-alpine
+
 WORKDIR /app
+
+# Instala dependências
 COPY package.json package-lock.json ./
 RUN npm ci
 
-# ─── Etapa 2: Build da aplicação ────────────────────────────────────────────
-FROM node:18-alpine AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+# Copia o código e faz o build
 COPY . .
 RUN npm run build
 
-# ─── Etapa 3: Imagem de produção (leve) ─────────────────────────────────────
-FROM node:18-alpine AS runner
-WORKDIR /app
-
 ENV NODE_ENV=production
+ENV PORT=3000
 
-# Copia apenas o necessário para rodar
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
+EXPOSE 3000
 
-ENV PORT=3001
-
-EXPOSE 3001
-
-CMD ["node", "server.js"]
+CMD ["npm", "start"]
