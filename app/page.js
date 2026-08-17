@@ -1,573 +1,870 @@
 "use client";
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
+
+// CrownTech Product Ecosystem Data
+const PRODUCTS = [
+  {
+    id: "tomaalista",
+    name: "Toma A Lista",
+    category: "eventos",
+    url: "https://tomaalista.com.br/",
+    tag: "Eventos & Credenciamento",
+    badge: "SaaS Ativo",
+    badgeClass: "badge-live",
+    desc: "Plataforma completa para gestão de eventos, listas VIP, credenciamento digital e controle de portaria em tempo real.",
+    features: [
+      "Check-in via QR Code e celular",
+      "Listas VIP e confirmações automáticas",
+      "Relatórios de presença e engajamento",
+      "Multi-operadores em portas simultâneas"
+    ],
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+        <polyline points="9 14 11 16 15 11"></polyline>
+      </svg>
+    )
+  },
+  {
+    id: "mycartao",
+    name: "MyCartão",
+    category: "gestao",
+    url: "https://www.mycartao.com.br/app",
+    tag: "Networking & Identity",
+    badge: "SaaS Ativo",
+    badgeClass: "badge-live",
+    desc: "Cartão de visitas digital interativo com compartilhamento via Aproximação (NFC), QR Code e PIX integrado para profissionais e empresas.",
+    features: [
+      "Compartilhamento instantâneo via NFC/QR",
+      "Links ilimitados e botão WhatsApp direto",
+      "PIX para recebimentos na hora",
+      "Catálogo de serviços no próprio perfil"
+    ],
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+        <line x1="2" y1="10" x2="22" y2="10"></line>
+      </svg>
+    )
+  },
+  {
+    id: "myprojectup",
+    name: "MyProjectUp",
+    category: "gestao",
+    url: "https://www.myprojectup.com.br/",
+    tag: "Gestão Corporativa",
+    badge: "SaaS Enterprise",
+    badgeClass: "badge-gold",
+    desc: "Sistema de alta produtividade para gestão de projetos corporativos, quadros Kanban, reporte de horas trabalhadas e alocação de equipes.",
+    features: [
+      "Quadros Kanban com colunas inteligentes",
+      "Acompanhamento de horas e custos por projeto",
+      "Relatórios de produtividade executiva",
+      "Notificações e sinergia de equipes"
+    ],
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="7" height="7"></rect>
+        <rect x="14" y="3" width="7" height="7"></rect>
+        <rect x="14" y="14" width="7" height="7"></rect>
+        <rect x="3" y="14" width="7" height="7"></rect>
+      </svg>
+    )
+  },
+  {
+    id: "conformagov",
+    name: "ConformaGov",
+    category: "gov",
+    url: "https://www.conformagov.com.br/",
+    tag: "Governança & Compliance",
+    badge: "Gov Tech",
+    badgeClass: "badge-primary",
+    desc: "Plataforma de alta segurança para governança pública, conformidade com a Nova Lei de Licitações e auditoria de processos governamentais.",
+    features: [
+      "Adequação rigorosa a normas públicas",
+      "Auditoria automatizada de processos",
+      "Portal da transparência e relatórios legais",
+      "Segurança de dados padrão militar/LGPD"
+    ],
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+        <path d="M2 17l10 5 10-5"></path>
+        <path d="M2 12l10 5 10-5"></path>
+      </svg>
+    )
+  },
+  {
+    id: "organizeup",
+    name: "OrganizeUp",
+    category: "gestao",
+    url: "https://organizeup.com.br/",
+    tag: "Finanças PME",
+    badge: "SaaS Ativo",
+    badgeClass: "badge-live",
+    desc: "Plataforma para gestão financeira empresarial, controle de fluxo de caixa, emissão de cobranças e inteligência de crescimento para PMEs.",
+    features: [
+      "Fluxo de caixa previsto vs. realizado",
+      "DRE gerencial automático",
+      "Gestão de contas a pagar e receber",
+      "Dashboard com KPIs em tempo real"
+    ],
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="12" y1="1" x2="12" y2="23"></line>
+        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+      </svg>
+    )
+  },
+  {
+    id: "menuri",
+    name: "Menuri",
+    category: "foodtech",
+    url: "https://www.menuri.com.br/",
+    tag: "FoodTech & Restaurantes",
+    badge: "SaaS Ativo",
+    badgeClass: "badge-live",
+    desc: "Cardápio digital interativo e ecossistema de autoatendimento para restaurantes, bares e lanchonetes com gestão de pedidos no balcão e mesas.",
+    features: [
+      "Cardápio QR Code com imagens em alta definição",
+      "Envio de pedidos para cozinha/WhatsApp",
+      "Painel de controle em tempo real",
+      "Atualização instantânea de produtos e preços"
+    ],
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+        <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+        <line x1="6" y1="1" x2="6" y2="4"></line>
+        <line x1="10" y1="1" x2="10" y2="4"></line>
+        <line x1="14" y1="1" x2="14" y2="4"></line>
+      </svg>
+    )
+  }
+];
+
+// Interactive Calculator Options
+const CALC_ITEMS = [
+  { id: "soft", label: "Desenvolvimento de Software / App Sob Medida", basePrice: 12000, days: 30 },
+  { id: "cftv", label: "Infraestrutura de Câmeras IP & CFTV Inteligente", basePrice: 4500, days: 7 },
+  { id: "rede", label: "Cabeamento Estruturado & Redes Cat6/Fibra", basePrice: 3800, days: 5 },
+  { id: "hotel", label: "Wi-Fi Corporativo & Portal para Hotelaria/Pousada", basePrice: 5500, days: 10 },
+  { id: "saas", label: "Implantação de SaaS CrownTech (ConformaGov / MyProjectUp / OrganizeUp)", basePrice: 2500, days: 3 }
+];
 
 export default function Home() {
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [productCategory, setProductCategory] = useState("all");
+  const [selectedCalcItems, setSelectedCalcItems] = useState(["soft", "saas"]);
+  const [leadForm, setLeadForm] = useState({ name: "", email: "", phone: "", service: "Desenvolvimento de Software", msg: "" });
+  const [formSubmitted, setFormSubmitted] = useState(false);
+
   useEffect(() => {
-    /* --- Header Scroll Effect --- */
-    const header = document.getElementById("header");
     const handleScroll = () => {
-      if (window.scrollY > 50) {
-        header?.classList.add("scrolled");
-      } else {
-        header?.classList.remove("scrolled");
-      }
+      setScrolled(window.scrollY > 40);
     };
     window.addEventListener("scroll", handleScroll);
-
-    /* --- Mobile Menu Toggle --- */
-    const navToggle = document.getElementById("nav-toggle");
-    const navMenu = document.getElementById("nav-menu");
-    const navLinks = document.querySelectorAll(".nav-link");
-
-    const toggleMenu = () => navMenu?.classList.toggle("active");
-    navToggle?.addEventListener("click", toggleMenu);
-
-    navLinks.forEach((link) => {
-      link.addEventListener("click", () =>
-        navMenu?.classList.remove("active")
-      );
-    });
-
-    /* --- Scroll Animations --- */
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("visible");
-          }
-        });
-      },
-      { root: null, rootMargin: "0px", threshold: 0.15 }
-    );
-
-    const animatedElements = document.querySelectorAll(".animate-on-scroll");
-    animatedElements.forEach((el) => observer.observe(el));
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      navToggle?.removeEventListener("click", toggleMenu);
-      observer.disconnect();
-    };
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const filteredProducts = productCategory === "all" 
+    ? PRODUCTS 
+    : PRODUCTS.filter(p => p.category === productCategory);
+
+  const toggleCalcItem = (id) => {
+    if (selectedCalcItems.includes(id)) {
+      setSelectedCalcItems(selectedCalcItems.filter(i => i !== id));
+    } else {
+      setSelectedCalcItems([...selectedCalcItems, id]);
+    }
+  };
+
+  const calcTotalCost = selectedCalcItems.reduce((acc, itemId) => {
+    const found = CALC_ITEMS.find(c => c.id === itemId);
+    return acc + (found ? found.basePrice : 0);
+  }, 0);
+
+  const calcTotalDays = Math.max(...selectedCalcItems.map(itemId => {
+    const found = CALC_ITEMS.find(c => c.id === itemId);
+    return found ? found.days : 0;
+  }), 0);
+
+  const handleLeadSubmit = (e) => {
+    e.preventDefault();
+    setFormSubmitted(true);
+    setTimeout(() => setFormSubmitted(false), 6000);
+  };
+
+  const generateWhatsAppLink = () => {
+    const text = `Olá CrownTech! Gostaria de solicitar um orçamento para:\nServiço: ${leadForm.service}\nNome: ${leadForm.name}\nContato: ${leadForm.email} / ${leadForm.phone}\nMensagem: ${leadForm.msg}`;
+    return `https://wa.me/5531999999999?text=${encodeURIComponent(text)}`;
+  };
 
   return (
     <>
-      {/* Header / Navbar */}
-      <header className="header" id="header">
-        <nav className="nav-container">
-          <a href="#" className="logo">
+      {/* Header / Navigation Bar */}
+      <header className={`header ${scrolled ? "scrolled" : ""}`}>
+        <div className="nav-container">
+          <Link href="/" className="logo">
             <Image
               src="/logo.svg"
-              alt="Crown Tech Logo"
-              width={36}
-              height={36}
-              className="logo-img"
+              alt="CrownTech Logo"
+              width={34}
+              height={34}
+              style={{ objectFit: "contain" }}
             />
-            <span className="logo-crown">Crown</span>
-            <span className="logo-tech">tech</span>
-          </a>
+            <span>
+              <span className="logo-crown">Crown</span>
+              <span className="logo-tech">Tech</span>
+            </span>
+          </Link>
 
-          <div className="nav-menu" id="nav-menu">
+          <nav className={`nav-menu ${mobileMenuOpen ? "active" : ""}`}>
             <ul className="nav-list">
-              <li className="nav-item">
-                <a href="#home" className="nav-link">
-                  Início
-                </a>
-              </li>
-              <li className="nav-item">
-                <a href="#sobre" className="nav-link">
-                  Sobre
-                </a>
-              </li>
-              <li className="nav-item">
-                <a href="#servicos" className="nav-link">
-                  Serviços
-                </a>
-              </li>
-              <li className="nav-item">
-                <a href="#produtos" className="nav-link">
-                  Produtos
-                </a>
-              </li>
-              <li className="nav-item">
-                <a href="#diferenciais" className="nav-link">
-                  Por que Nós?
-                </a>
-              </li>
-              <li className="nav-item">
-                <a href="#contato" className="nav-link">
-                  Contato
-                </a>
-              </li>
+              <li><a href="#home" className="nav-link" onClick={() => setMobileMenuOpen(false)}>Início</a></li>
+              <li><a href="#produtos" className="nav-link" onClick={() => setMobileMenuOpen(false)}>Ecossistema SaaS</a></li>
+              <li><a href="#servicos" className="nav-link" onClick={() => setMobileMenuOpen(false)}>Serviços Corporativos</a></li>
+              <li><a href="#orcamento" className="nav-link" onClick={() => setMobileMenuOpen(false)}>Simulador ROI</a></li>
+              <li><a href="#sobre" className="nav-link" onClick={() => setMobileMenuOpen(false)}>Sobre</a></li>
+              <li><a href="#contato" className="nav-link" onClick={() => setMobileMenuOpen(false)}>Contato</a></li>
             </ul>
-          </div>
+          </nav>
 
           <div className="nav-actions">
-            <a href="mailto:contato@crowntech.com.br" className="btn btn-primary">
+            <Link href="/admin" className="btn btn-outline btn-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+              Área Admin
+            </Link>
+            <a href="#contato" className="btn btn-primary btn-sm">
               Fale Conosco
             </a>
-            <button className="nav-toggle" id="nav-toggle" aria-label="Abrir Menu">
+            <button
+              className="nav-toggle"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Abrir Menu"
+            >
               <span></span>
               <span></span>
               <span></span>
             </button>
           </div>
-        </nav>
+        </div>
       </header>
 
       <main>
         {/* Hero Section */}
         <section className="hero" id="home">
-          <div className="hero-shapes">
-            <div className="shape shape-1"></div>
-            <div className="shape shape-2"></div>
-            <div className="shape shape-3"></div>
-          </div>
-          <div className="container hero-container">
-            <div className="hero-content animate-on-scroll">
-              <div className="hero-eyebrow">
-                <span className="eyebrow-line"></span>
-                <span className="badge">Inovação &amp; Tecnologia</span>
+          <div className="hero-glow-1"></div>
+          <div className="hero-glow-2"></div>
+          
+          <div className="container">
+            <div className="hero-grid">
+              <div>
+                <div className="hero-eyebrow">
+                  <span className="badge badge-gold">Empresa de Tecnologia &amp; Inovação</span>
+                  <span className="badge badge-live">SLA 99.9% Garantido</span>
+                </div>
+                
+                <h1 className="hero-title">
+                  Ecossistema de Software <br />
+                  <span className="text-gradient-cyan">&amp; Infraestrutura Corporativa</span>
+                  <br />de Alta Performance
+                </h1>
+
+                <p className="hero-description">
+                  A **CrownTech** desenvolve softwares proprietários de alto valor (SaaS), sistemas sob medida e infraestrutura de TI corporativa de alto nível para acelerar o crescimento e a segurança do seu negócio.
+                </p>
+
+                <div className="hero-ctas">
+                  <a href="#produtos" className="btn btn-primary btn-lg">
+                    Explorar Produtos SaaS
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                      <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                  </a>
+                  <a href="#orcamento" className="btn btn-gold btn-lg">
+                    Simular Investimento
+                  </a>
+                </div>
+
+                <div className="hero-kpi-grid">
+                  <div className="kpi-card">
+                    <div className="kpi-val">6+</div>
+                    <div className="kpi-label">Plataformas SaaS Propriedade CrownTech</div>
+                  </div>
+                  <div className="kpi-card">
+                    <div className="kpi-val">100%</div>
+                    <div className="kpi-label">Projetos Entregues no Prazo</div>
+                  </div>
+                  <div className="kpi-card">
+                    <div className="kpi-val">24/7</div>
+                    <div className="kpi-label">Suporte &amp; Monitoramento</div>
+                  </div>
+                </div>
               </div>
-              <h1 className="hero-title">
-                Soluções Corporativas <br />
-                <span className="text-gradient">que Impulsionam</span>
-                <br />o Seu Negócio
-              </h1>
-              <p className="hero-description">
-                Da infraestrutura física à transformação digital — a Crowntech
-                oferece serviços e produtos de tecnologia com excelência,
-                segurança e comprometimento.
-              </p>
-              <div className="hero-buttons">
-                <a href="#servicos" className="btn btn-primary btn-lg">
-                  Ver Serviços
-                </a>
-                <a href="#contato" className="btn btn-outline btn-lg">
-                  Entrar em Contato
-                </a>
-              </div>
-            </div>
-            <div className="hero-stats animate-on-scroll delay-1">
-              <div className="stat-box">
-                <div className="stat-icon">🔒</div>
-                <p>Segurança &amp; CFTV</p>
-              </div>
-              <div className="stat-box">
-                <div className="stat-icon">📡</div>
-                <p>Redes &amp; Cabeamento</p>
-              </div>
-              <div className="stat-box">
-                <div className="stat-icon">💻</div>
-                <p>Software Sob Medida</p>
-              </div>
-              <div className="stat-box">
-                <div className="stat-icon">🏨</div>
-                <p>Modernização Hotelaria</p>
+
+              {/* Ecosystem Interactive Card Visual */}
+              <div className="hero-visual-card">
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <Image src="/logo.svg" alt="CrownTech" width={28} height={28} />
+                    <span style={{ fontWeight: 800, fontSize: "1.1rem" }}>CrownTech Suite</span>
+                  </div>
+                  <span className="badge badge-gold">Ecosistema Ativo</span>
+                </div>
+
+                <p style={{ fontSize: "0.875rem", color: "var(--clr-text-muted)", marginBottom: "1.5rem" }}>
+                  Plataformas prontas para uso imediato em diversos segmentos do mercado:
+                </p>
+
+                <div className="ecosystem-badge-list">
+                  {PRODUCTS.map((prod) => (
+                    <a key={prod.id} href={prod.url} target="_blank" rel="noopener noreferrer" className="eco-item">
+                      <div className="eco-name">
+                        <span style={{ color: "var(--clr-accent-cyan)" }}>{prod.icon}</span>
+                        {prod.name}
+                      </div>
+                      <span className="badge badge-primary" style={{ fontSize: "0.7rem" }}>{prod.tag}</span>
+                    </a>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Serviços Section */}
-        <section className="services section" id="servicos">
+        {/* Institutional Trust & CNPJ Banner */}
+        <section className="trust-banner">
           <div className="container">
-            <div className="section-header text-center animate-on-scroll">
-              <span className="section-subtitle">Nossa Expertise</span>
-              <h2 className="section-title">Serviços Corporativos</h2>
+            <div className="trust-grid">
+              <div className="trust-item">
+                <div className="trust-icon">🏛️</div>
+                <div>
+                  <strong style={{ display: "block", fontSize: "0.95rem" }}>CNPJ Registrado</strong>
+                  <span style={{ fontSize: "0.85rem", color: "var(--clr-text-muted)" }}>65.586.793/0001-18</span>
+                </div>
+              </div>
+              <div className="trust-item">
+                <div className="trust-icon">🛡️</div>
+                <div>
+                  <strong style={{ display: "block", fontSize: "0.95rem" }}>Conformidade LGPD</strong>
+                  <span style={{ fontSize: "0.85rem", color: "var(--clr-text-muted)" }}>Proteção rigorosa de dados</span>
+                </div>
+              </div>
+              <div className="trust-item">
+                <div className="trust-icon">⚙️</div>
+                <div>
+                  <strong style={{ display: "block", fontSize: "0.95rem" }}>Arquitetura Escalável</strong>
+                  <span style={{ fontSize: "0.85rem", color: "var(--clr-text-muted)" }}>Cloud &amp; Microserviços</span>
+                </div>
+              </div>
+              <div className="trust-item">
+                <div className="trust-icon">🤝</div>
+                <div>
+                  <strong style={{ display: "block", fontSize: "0.95rem" }}>Contratos Oficiais</strong>
+                  <span style={{ fontSize: "0.85rem", color: "var(--clr-text-muted)" }}>Garantia por SLA legal</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Products Ecosystem Section */}
+        <section className="section section-bg-alt" id="produtos">
+          <div className="container">
+            <div className="section-header text-center">
+              <span className="section-subtitle">Nossos Produtos Proprietários</span>
+              <h2 className="section-title">Soluções Digitais &amp; SaaS Desenvolvidos pela CrownTech</h2>
               <p className="section-description">
-                Soluções completas para empresas que buscam eficiência, segurança
-                e conectividade.
+                Além de prestar serviços corporativos sob medida, possuímos um ecossistema de produtos digitais robustos, criados para resolver problemas reais de empresas, órgãos públicos e eventos.
+              </p>
+            </div>
+
+            {/* Filter Tabs */}
+            <div className="products-filter">
+              <button 
+                className={`filter-btn ${productCategory === "all" ? "active" : ""}`}
+                onClick={() => setProductCategory("all")}
+              >
+                Todos os Produtos (6)
+              </button>
+              <button 
+                className={`filter-btn ${productCategory === "gestao" ? "active" : ""}`}
+                onClick={() => setProductCategory("gestao")}
+              >
+                Gestão &amp; Produtividade
+              </button>
+              <button 
+                className={`filter-btn ${productCategory === "gov" ? "active" : ""}`}
+                onClick={() => setProductCategory("gov")}
+              >
+                GovTech &amp; Compliance
+              </button>
+              <button 
+                className={`filter-btn ${productCategory === "foodtech" ? "active" : ""}`}
+                onClick={() => setProductCategory("foodtech")}
+              >
+                FoodTech &amp; Restaurantes
+              </button>
+              <button 
+                className={`filter-btn ${productCategory === "eventos" ? "active" : ""}`}
+                onClick={() => setProductCategory("eventos")}
+              >
+                Eventos &amp; Acesso
+              </button>
+            </div>
+
+            {/* Product Cards Grid */}
+            <div className="products-grid">
+              {filteredProducts.map((prod) => (
+                <div key={prod.id} className="glass-card product-card">
+                  <div>
+                    <div className="product-top">
+                      <div className="product-icon-wrap">{prod.icon}</div>
+                      <span className={`badge ${prod.badgeClass}`}>{prod.badge}</span>
+                    </div>
+
+                    <h3 className="product-title">{prod.name}</h3>
+                    <span style={{ display: "inline-block", fontSize: "0.8rem", color: "var(--clr-accent-cyan)", fontWeight: 700, marginBottom: "0.85rem" }}>
+                      {prod.tag}
+                    </span>
+
+                    <p className="product-desc">{prod.desc}</p>
+
+                    <div className="product-features">
+                      {prod.features.map((feat, idx) => (
+                        <div key={idx} className="product-feature-item">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                          <span>{feat}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="product-footer">
+                    <a 
+                      href={prod.url} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="product-url"
+                    >
+                      Acessar Plataforma
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="7" y1="17" x2="17" y2="7"></line>
+                        <polyline points="7 7 17 7 17 17"></polyline>
+                      </svg>
+                    </a>
+
+                    <a 
+                      href={prod.url} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="btn btn-outline btn-sm"
+                    >
+                      Ver Mais
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Corporate Services Section */}
+        <section className="section" id="servicos">
+          <div className="container">
+            <div className="section-header text-center">
+              <span className="section-subtitle">Serviços Corporativos Especializados</span>
+              <h2 className="section-title">Infraestrutura Física &amp; Desenvolvimento de Software</h2>
+              <p className="section-description">
+                Garantimos excelência operacional com engenheiros e técnicos qualificados para projetos de infraestrutura tecnológica de ponta a ponta.
               </p>
             </div>
 
             <div className="services-grid">
-              {/* Service 1: Câmeras */}
-              <div className="service-card animate-on-scroll">
-                <div className="service-card-top">
-                  <div className="service-icon cam-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M15.6 11.6L22 7v10l-6.4-4.5v-1z"></path>
-                      <rect x="2" y="5" width="14" height="14" rx="2" ry="2"></rect>
-                    </svg>
-                  </div>
-                  <span className="service-tag">Segurança</span>
-                </div>
-                <h3 className="service-title">Câmeras de Segurança</h3>
-                <p className="service-text">
-                  Instalação profissional de câmeras e sistemas CFTV de alta
-                  resolução.
+              {/* Service 1 */}
+              <div className="service-card">
+                <div className="service-icon-box soft">💻</div>
+                <h3 className="service-title">Desenvolvimento de Software Sob Medida</h3>
+                <p className="service-desc">
+                  Arquitetura de sistemas web corporativos, APIs RESTful, aplicativos móveis e integrações com bancos de dados relacionais e em nuvem.
                 </p>
-                <ul className="service-list">
-                  <li>Câmeras IP e Analógicas</li>
-                  <li>Gravação HD / Full HD</li>
-                  <li>Acesso remoto via app</li>
-                </ul>
               </div>
 
-              {/* Service 2: Cabeamento */}
-              <div className="service-card animate-on-scroll delay-1">
-                <div className="service-card-top">
-                  <div className="service-icon net-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="2" y="2" width="6" height="6" rx="1"></rect>
-                      <rect x="16" y="2" width="6" height="6" rx="1"></rect>
-                      <rect x="9" y="9" width="6" height="6" rx="1"></rect>
-                      <rect x="2" y="16" width="6" height="6" rx="1"></rect>
-                      <rect x="16" y="16" width="6" height="6" rx="1"></rect>
-                      <line x1="5" y1="8" x2="12" y2="12"></line>
-                      <line x1="19" y1="8" x2="12" y2="12"></line>
-                      <line x1="5" y1="16" x2="12" y2="15"></line>
-                      <line x1="19" y1="16" x2="12" y2="15"></line>
-                    </svg>
-                  </div>
-                  <span className="service-tag">Infraestrutura</span>
-                </div>
-                <h3 className="service-title">Cabeamento Estruturado</h3>
-                <p className="service-text">
-                  Projeto e instalação de rede física para escritórios e lojas.
-                  Organização completa com conectividade rápida e estável.
+              {/* Service 2 */}
+              <div className="service-card">
+                <div className="service-icon-box cam">📷</div>
+                <h3 className="service-title">Câmeras IP &amp; CFTV Inteligente</h3>
+                <p className="service-desc">
+                  Projetos de segurança eletrônica com câmeras de altíssima resolução, inteligência artificial para detecção de movimento e gravação redundante.
                 </p>
-                <ul className="service-list">
-                  <li>Cat5e / Cat6</li>
-                  <li>Rack e patch panel</li>
-                </ul>
               </div>
 
-              {/* Service 3: Hotelaria */}
-              <div className="service-card animate-on-scroll delay-2">
-                <div className="service-card-top">
-                  <div className="service-icon hotel-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
-                      <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
-                      <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
-                      <line x1="12" y1="20" x2="12.01" y2="20"></line>
-                    </svg>
-                  </div>
-                  <span className="service-tag">Hotelaria</span>
-                </div>
-                <h3 className="service-title">Modernização de Hotelaria</h3>
-                <p className="service-text">
-                  Wi-Fi premium de alta performance e rede cabeada estável em
-                  todos os quartos da sua pousada ou hotel.
+              {/* Service 3 */}
+              <div className="service-card">
+                <div className="service-icon-box net">🌐</div>
+                <h3 className="service-title">Cabeamento Estruturado &amp; Redes</h3>
+                <p className="service-desc">
+                  Organização de racks, cabeamento Cat6/Fibra Óptica, roteamento de alta velocidade e certificação de rede física para empresas.
                 </p>
-                <ul className="service-list">
-                  <li>Wi-Fi por quarto (Access Points)</li>
-                  <li>Rede cabeada estruturada</li>
-                  <li>Gerenciamento centralizado</li>
-                </ul>
               </div>
 
-              {/* Service 4: Software */}
-              <div className="service-card animate-on-scroll">
-                <div className="service-card-top">
-                  <div className="service-icon soft-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="16 18 22 12 16 6"></polyline>
-                      <polyline points="8 6 2 12 8 18"></polyline>
-                    </svg>
-                  </div>
-                  <span className="service-tag">TI</span>
-                </div>
-                <h3 className="service-title">Desenvolvimento de Software</h3>
-                <p className="service-text">
-                  Sistemas e aplicações sob medida, desenvolvidos com as melhores
-                  tecnologias para o seu negócio crescer.
+              {/* Service 4 */}
+              <div className="service-card">
+                <div className="service-icon-box hotel">🏨</div>
+                <h3 className="service-title">Wi-Fi &amp; Modernização para Hotelaria</h3>
+                <p className="service-desc">
+                  Instalação de Access Points de alta densidade por quarto/área comum para hotéis e pousadas com gerenciamento e portal captivo personalizado.
                 </p>
-                <ul className="service-list">
-                  <li>Sistemas Web</li>
-                  <li>Consultoria em TI</li>
-                </ul>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Produtos Section */}
-        <section className="products section bg-alt" id="produtos">
+        {/* Interactive Budget / Project ROI Calculator */}
+        <section className="section section-bg-alt" id="orcamento">
           <div className="container">
-            <div className="section-header text-center animate-on-scroll">
-              <span className="section-subtitle">Produtos Próprios</span>
-              <h2 className="section-title">Tecnologia que Criamos</h2>
+            <div className="section-header text-center">
+              <span className="section-subtitle">Simulador de Investimento</span>
+              <h2 className="section-title">Estime o Valor do Seu Projeto Corporativo</h2>
               <p className="section-description">
-                Além dos serviços, desenvolvemos produtos digitais próprios
-                disponíveis no mercado.
+                Selecione as soluções desejadas para visualizar uma estimativa transparente de investimento e prazo médio de entrega pela equipe CrownTech.
               </p>
             </div>
-            <div className="products-grid">
-              <div className="product-card animate-on-scroll">
-                <div className="product-badge">App</div>
-                <div className="product-icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M9 11l3 3L22 4"></path>
-                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-                  </svg>
-                </div>
-                <h3>Toma A Lista</h3>
-                <p>
-                  Plataforma completa para gestão de eventos e listas de
-                  participantes. Controle em tempo real pelo celular, confirmações
-                  e relatórios automatizados.
-                </p>
-                <a
-                  href="https://www.tomaalista.com.br"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="product-link"
-                >
-                  Acessar plataforma{" "}
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                    <polyline points="12 5 19 12 12 19"></polyline>
-                  </svg>
-                </a>
-              </div>
-              <div className="product-card animate-on-scroll delay-1">
-                <div className="product-badge">Em breve</div>
-                <div className="product-icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
-                    <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
-                    <line x1="6" y1="1" x2="6" y2="4"></line>
-                    <line x1="10" y1="1" x2="10" y2="4"></line>
-                    <line x1="14" y1="1" x2="14" y2="4"></line>
-                  </svg>
-                </div>
-                <h3>Cardápio Online</h3>
-                <p>
-                  Plataforma digital para restaurantes e bares com painel
-                  administrativo completo, cardápio responsivo e gerenciamento de
-                  pedidos em tempo real.
-                </p>
-                <span className="product-link muted">Em desenvolvimento</span>
-              </div>
-            </div>
-          </div>
-        </section>
 
-        {/* Sobre Section */}
-        <section className="about section" id="sobre">
-          <div className="container about-container">
-            <div className="about-content animate-on-scroll">
-              <span className="section-subtitle">Quem Somos</span>
-              <h2 className="section-title">
-                Tecnologia <span className="text-gradient">com Propósito</span>
-              </h2>
-              <p className="about-text">
-                A <strong>Crowntech</strong> é uma empresa de tecnologia focada em
-                entregar soluções reais para negócios reais. Atuamos com
-                responsabilidade, técnica apurada e parceria de longo prazo.
-              </p>
-              <p className="about-text">
-                De câmeras de segurança a sistemas digitais complexos, nosso
-                compromisso é o mesmo:{" "}
-                <strong>
-                  excelência na entrega e satisfação do cliente.
-                </strong>
-              </p>
-              <ul className="about-list">
-                <li>
-                  <span className="check-icon">✔</span> Soluções customizadas para
-                  cada cliente
-                </li>
-                <li>
-                  <span className="check-icon">✔</span> Instalações físicas com
-                  garantia de qualidade
-                </li>
-                <li>
-                  <span className="check-icon">✔</span> Suporte técnico e
-                  relacionamento transparente
-                </li>
-                <li>
-                  <span className="check-icon">✔</span> Portfólio de produtos
-                  digitais próprios
-                </li>
-              </ul>
-            </div>
-            <div className="about-visual animate-on-scroll delay-1">
-              <div className="about-card">
-                <div className="about-card-item">
-                  <div className="about-icon">🎯</div>
-                  <div>
-                    <strong>Missão</strong>
-                    <p>
-                      Transformar tecnologia em vantagem competitiva para nossos
-                      clientes.
-                    </p>
-                  </div>
+            <div className="calc-wrapper">
+              <div className="calc-grid">
+                <div className="calc-options">
+                  <h4 style={{ fontSize: "1.2rem", marginBottom: "0.5rem", color: "#FFF" }}>Selecione os Serviços ou Produtos:</h4>
+                  {CALC_ITEMS.map((item) => {
+                    const isSelected = selectedCalcItems.includes(item.id);
+                    return (
+                      <div 
+                        key={item.id} 
+                        className={`calc-option-item ${isSelected ? "selected" : ""}`}
+                        onClick={() => toggleCalcItem(item.id)}
+                      >
+                        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                          <div className="chk-box">
+                            {isSelected && (
+                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0B0F19" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                              </svg>
+                            )}
+                          </div>
+                          <div>
+                            <strong style={{ display: "block", fontSize: "0.95rem" }}>{item.label}</strong>
+                            <span style={{ fontSize: "0.825rem", color: "var(--clr-text-muted)" }}>Prazo estimado: ~{item.days} dias</span>
+                          </div>
+                        </div>
+
+                        <span style={{ fontWeight: 700, color: "var(--clr-accent-cyan)" }}>
+                          R$ {item.basePrice.toLocaleString('pt-BR')}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
-                <div className="about-card-item">
-                  <div className="about-icon">🔭</div>
-                  <div>
-                    <strong>Visão</strong>
-                    <p>
-                      Ser referência em soluções integradas de TI e segurança
-                      eletrônica.
-                    </p>
+
+                <div className="calc-summary-card">
+                  <span className="badge badge-gold">Estimativa Transparente</span>
+                  <h3 style={{ marginTop: "1rem", fontSize: "1.3rem" }}>Investimento Estimado</h3>
+                  
+                  <div className="calc-total">
+                    R$ {calcTotalCost.toLocaleString('pt-BR')},00
                   </div>
-                </div>
-                <div className="about-card-item">
-                  <div className="about-icon">💎</div>
-                  <div>
-                    <strong>Valores</strong>
-                    <p>
-                      Excelência, ética, inovação e parceria verdadeira com cada
-                      cliente.
-                    </p>
-                  </div>
+
+                  <p style={{ fontSize: "0.9rem", color: "var(--clr-text-muted)", marginBottom: "1.75rem" }}>
+                    Prazo total de execução estimado: <strong>~{calcTotalDays} dias úteis</strong>. <br />
+                    Parcelamento facilitado e contratos faturados para CNPJ.
+                  </p>
+
+                  <a 
+                    href="#contato" 
+                    className="btn btn-gold btn-lg"
+                    style={{ width: "100%" }}
+                  >
+                    Solicitar Proposta Formal
+                  </a>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Diferenciais Section */}
-        <section className="features section bg-alt" id="diferenciais">
+        {/* Institutional & About Section */}
+        <section className="section" id="sobre">
           <div className="container">
-            <div className="section-header text-center animate-on-scroll">
-              <span className="section-subtitle">Nossos Diferenciais</span>
-              <h2 className="section-title">
-                Por que Escolher a Crowntech?
-              </h2>
-            </div>
-            <div className="features-grid animate-on-scroll">
-              <div className="feature-item">
-                <div className="feature-icon">🚀</div>
-                <h4>Agilidade</h4>
-                <p>
-                  Entregas no prazo, sem abrir mão da qualidade e da segurança do
-                  serviço.
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem", alignItems: "center" }}>
+              <div>
+                <span className="section-subtitle">Sobre a CrownTech</span>
+                <h2 className="section-title">
+                  Engenharia e Inovação para Negócios de Sucesso
+                </h2>
+                <p style={{ color: "var(--clr-text-muted)", fontSize: "1.05rem", lineHeight: "1.7", marginBottom: "1.25rem" }}>
+                  A <strong>Crown Tech Ltda</strong> é uma empresa brasileira de tecnologia focada na criação de soluções de alto impacto corporativo, unindo engenharia de software avançada com a instalação e manutenção de infraestrutura de TI de alta confiabilidade.
                 </p>
+                <p style={{ color: "var(--clr-text-muted)", fontSize: "1.05rem", lineHeight: "1.7", marginBottom: "2rem" }}>
+                  Atuamos com transparência ética, governança rigorosa e suporte dedicado aos nossos clientes.
+                </p>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem" }}>
+                  <div style={{ background: "rgba(255,255,255,0.03)", padding: "1.25rem", borderRadius: "12px", border: "1px solid var(--clr-border)" }}>
+                    <div style={{ color: "var(--clr-accent-gold)", fontWeight: 800, fontSize: "1.1rem", marginBottom: "0.25rem" }}>Missão</div>
+                    <span style={{ fontSize: "0.875rem", color: "var(--clr-text-muted)" }}>Desenvolver softwares e infraestrutura segura para gerar máxima rentabilidade.</span>
+                  </div>
+                  <div style={{ background: "rgba(255,255,255,0.03)", padding: "1.25rem", borderRadius: "12px", border: "1px solid var(--clr-border)" }}>
+                    <div style={{ color: "var(--clr-accent-cyan)", fontWeight: 800, fontSize: "1.1rem", marginBottom: "0.25rem" }}>Visão</div>
+                    <span style={{ fontSize: "0.875rem", color: "var(--clr-text-muted)" }}>Ser ecossistema referência nacional de produtos SaaS e soluções de infraestrutura.</span>
+                  </div>
+                </div>
               </div>
-              <div className="feature-item">
-                <div className="feature-icon">🛡️</div>
-                <h4>Confiabilidade</h4>
-                <p>
-                  Infraestrutura e sistemas construídos com os melhores padrões do
-                  mercado.
-                </p>
-              </div>
-              <div className="feature-item">
-                <div className="feature-icon">💡</div>
-                <h4>Inovação</h4>
-                <p>
-                  Utilizamos tecnologias modernas e escaláveis em todas as nossas
-                  soluções.
-                </p>
-              </div>
-              <div className="feature-item">
-                <div className="feature-icon">🤝</div>
-                <h4>Parceria de Verdade</h4>
-                <p>
-                  Entendemos o seu negócio e trabalhamos como parte do seu time.
-                </p>
+
+              <div className="glass-card" style={{ padding: "2.5rem" }}>
+                <h3 style={{ fontSize: "1.4rem", marginBottom: "1.5rem" }}>Credenciais Corporativas</h3>
+                
+                <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+                  <div style={{ borderBottom: "1px solid var(--clr-border)", paddingBottom: "1rem" }}>
+                    <span style={{ fontSize: "0.8rem", color: "var(--clr-text-muted)", textTransform: "uppercase" }}>Razão Social</span>
+                    <strong style={{ display: "block", fontSize: "1.05rem", color: "#FFF" }}>CROWN TECH LTDA</strong>
+                  </div>
+
+                  <div style={{ borderBottom: "1px solid var(--clr-border)", paddingBottom: "1rem" }}>
+                    <span style={{ fontSize: "0.8rem", color: "var(--clr-text-muted)", textTransform: "uppercase" }}>CNPJ Registrado</span>
+                    <strong style={{ display: "block", fontSize: "1.05rem", color: "var(--clr-accent-gold)" }}>65.586.793/0001-18</strong>
+                  </div>
+
+                  <div style={{ borderBottom: "1px solid var(--clr-border)", paddingBottom: "1rem" }}>
+                    <span style={{ fontSize: "0.8rem", color: "var(--clr-text-muted)", textTransform: "uppercase" }}>Canal de Auditoria &amp; Conformidade</span>
+                    <strong style={{ display: "block", fontSize: "1rem", color: "var(--clr-accent-cyan)" }}>contato@crowntech.com.br</strong>
+                  </div>
+
+                  <div>
+                    <span style={{ fontSize: "0.8rem", color: "var(--clr-text-muted)", textTransform: "uppercase" }}>Status Jurídico</span>
+                    <div style={{ marginTop: "0.35rem" }}>
+                      <span className="badge badge-live">Regular &amp; Ativo na Receita Federal</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Contato Section */}
-        <section className="contact section" id="contato">
+        {/* Contact Section */}
+        <section className="section section-bg-alt" id="contato">
           <div className="container">
-            <div className="contact-block animate-on-scroll">
-              <div className="contact-text-side">
-                <span className="section-subtitle">Vamos Conversar?</span>
-                <h2 className="section-title">Entre em Contato</h2>
-                <p>
-                  Estamos prontos para entender os desafios da sua empresa e
-                  propor a melhor solução tecnológica. Envie um e-mail e
-                  retornaremos rapidamente.
-                </p>
-              </div>
-              <div className="contact-cta-side">
-                <div className="contact-email-card">
-                  <div className="email-icon-wrap">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                      <polyline points="22,6 12,13 2,6"></polyline>
-                    </svg>
-                  </div>
+            <div className="section-header text-center">
+              <span className="section-subtitle">Atendimento Executivo</span>
+              <h2 className="section-title">Entre em Contato com a Nossa Equipe</h2>
+              <p className="section-description">
+                Estamos prontos para atender a sua empresa. Envie um e-mail ou inicie uma conversa direta via WhatsApp para receber uma proposta personalizada.
+              </p>
+            </div>
+
+            <div className="contact-grid">
+              <div className="contact-info">
+                <div className="contact-card-item">
+                  <div className="trust-icon">📧</div>
                   <div>
-                    <p className="email-label">E-mail corporativo</p>
-                    <a
-                      href="mailto:contato@crowntech.com.br"
-                      className="email-address"
-                    >
+                    <span style={{ fontSize: "0.8rem", color: "var(--clr-text-muted)" }}>E-mail Oficial</span>
+                    <a href="mailto:contato@crowntech.com.br" style={{ display: "block", fontWeight: 700, fontSize: "1.1rem", color: "#FFF" }}>
                       contato@crowntech.com.br
                     </a>
                   </div>
                 </div>
-                <a
-                  href="mailto:contato@crowntech.com.br"
-                  className="btn btn-primary btn-lg"
-                >
-                  Enviar E-mail
-                </a>
+
+                <div className="contact-card-item">
+                  <div className="trust-icon">💬</div>
+                  <div>
+                    <span style={{ fontSize: "0.8rem", color: "var(--clr-text-muted)" }}>WhatsApp Corporativo</span>
+                    <strong style={{ display: "block", fontSize: "1.1rem", color: "var(--clr-accent-emerald)" }}>
+                      Atendimento Direto &amp; Orçamentos
+                    </strong>
+                  </div>
+                </div>
+
+                <div className="contact-card-item">
+                  <div className="trust-icon">🏢</div>
+                  <div>
+                    <span style={{ fontSize: "0.8rem", color: "var(--clr-text-muted)" }}>Endereço Institucional</span>
+                    <strong style={{ display: "block", fontSize: "0.95rem", color: "#FFF" }}>
+                      Brasil — Atendimento Nacional &amp; Projetos Presenciais
+                    </strong>
+                  </div>
+                </div>
+
+                <div style={{ marginTop: "1rem" }}>
+                  <a 
+                    href={generateWhatsAppLink()} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="btn btn-gold btn-lg" 
+                    style={{ width: "100%" }}
+                  >
+                    Falar via WhatsApp Agora
+                  </a>
+                </div>
+              </div>
+
+              {/* Lead Form */}
+              <div className="glass-card">
+                {formSubmitted ? (
+                  <div style={{ textAlign: "center", padding: "2rem 0" }}>
+                    <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🎉</div>
+                    <h3 style={{ fontSize: "1.5rem", marginBottom: "0.5rem" }}>Mensagem Enviada!</h3>
+                    <p style={{ color: "var(--clr-text-muted)" }}>
+                      Obrigado pelo contato! Nossa equipe técnica retornará a sua solicitação em até 2 horas úteis.
+                    </p>
+                  </div>
+                ) : (
+                  <form onSubmit={handleLeadSubmit}>
+                    <h3 style={{ fontSize: "1.3rem", marginBottom: "1.25rem" }}>Solicitar Proposta Comercial</h3>
+
+                    <div className="form-group">
+                      <label className="form-label">Nome Completo</label>
+                      <input 
+                        type="text" 
+                        required 
+                        className="form-input" 
+                        placeholder="Ex: Carlos Silva"
+                        value={leadForm.name}
+                        onChange={(e) => setLeadForm({...leadForm, name: e.target.value})}
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">E-mail Corporativo</label>
+                      <input 
+                        type="email" 
+                        required 
+                        className="form-input" 
+                        placeholder="carlos@empresa.com.br"
+                        value={leadForm.email}
+                        onChange={(e) => setLeadForm({...leadForm, email: e.target.value})}
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Telefone / WhatsApp</label>
+                      <input 
+                        type="tel" 
+                        required 
+                        className="form-input" 
+                        placeholder="(31) 99999-9999"
+                        value={leadForm.phone}
+                        onChange={(e) => setLeadForm({...leadForm, phone: e.target.value})}
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Serviço ou Produto Principal</label>
+                      <select 
+                        className="form-select"
+                        value={leadForm.service}
+                        onChange={(e) => setLeadForm({...leadForm, service: e.target.value})}
+                      >
+                        <option value="Desenvolvimento de Software">Desenvolvimento de Software Sob Medida</option>
+                        <option value="Câmeras e CFTV">Câmeras de Segurança / CFTV</option>
+                        <option value="Cabeamento Estruturado">Cabeamento Estruturado / Redes</option>
+                        <option value="Wi-Fi Hotelaria">Modernização Wi-Fi Hotelaria</option>
+                        <option value="Assinatura SaaS">Assinatura de Produtos SaaS (Toma A Lista, ConformaGov, etc.)</option>
+                      </select>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Detalhes da Necessidade</label>
+                      <textarea 
+                        rows={3} 
+                        className="form-textarea" 
+                        placeholder="Descreva resumidamente seu projeto..."
+                        value={leadForm.msg}
+                        onChange={(e) => setLeadForm({...leadForm, msg: e.target.value})}
+                      ></textarea>
+                    </div>
+
+                    <button type="submit" className="btn btn-primary btn-lg" style={{ width: "100%" }}>
+                      Enviar Solicitação de Orçamento
+                    </button>
+                  </form>
+                )}
               </div>
             </div>
           </div>
         </section>
       </main>
 
+      {/* Footer */}
       <footer className="footer">
-        <div className="container footer-container">
-          <div className="footer-brand">
-            <a href="#" className="logo">
-              <Image
-                src="/logo.svg"
-                alt="Crown Tech Logo"
-                width={32}
-                height={32}
-                className="logo-img logo-img-footer"
-              />
-              <span className="logo-crown">Crown</span>
-              <span className="logo-tech">tech</span>
-            </a>
-            <p className="footer-desc">
-              Excelência, segurança e inovação em tecnologia da informação.
-              Resolvendo o hoje e arquitetando o futuro do seu negócio.
-            </p>
+        <div className="container">
+          <div className="footer-grid">
+            <div className="footer-brand">
+              <Link href="/" className="logo">
+                <Image src="/logo.svg" alt="CrownTech Logo" width={32} height={32} />
+                <span>
+                  <span className="logo-crown">Crown</span>
+                  <span className="logo-tech">Tech</span>
+                </span>
+              </Link>
+              <p>
+                Empresa especializada no desenvolvimento de produtos SaaS de alto valor e soluções corporativas de engenharia de software e infraestrutura de TI.
+              </p>
+            </div>
+
+            <div className="footer-col">
+              <h4>Navegação</h4>
+              <ul className="footer-links">
+                <li><a href="#home">Início</a></li>
+                <li><a href="#produtos">Ecossistema SaaS</a></li>
+                <li><a href="#servicos">Serviços Corporativos</a></li>
+                <li><a href="#orcamento">Simulador ROI</a></li>
+                <li><a href="#sobre">Sobre a Empresa</a></li>
+              </ul>
+            </div>
+
+            <div className="footer-col">
+              <h4>Produtos SaaS</h4>
+              <ul className="footer-links">
+                <li><a href="https://tomaalista.com.br/" target="_blank" rel="noreferrer">Toma A Lista</a></li>
+                <li><a href="https://www.mycartao.com.br/app" target="_blank" rel="noreferrer">MyCartão</a></li>
+                <li><a href="https://www.myprojectup.com.br/" target="_blank" rel="noreferrer">MyProjectUp</a></li>
+                <li><a href="https://www.conformagov.com.br/" target="_blank" rel="noreferrer">ConformaGov</a></li>
+                <li><a href="https://organizeup.com.br/" target="_blank" rel="noreferrer">OrganizeUp</a></li>
+                <li><a href="https://www.menuri.com.br/" target="_blank" rel="noreferrer">Menuri</a></li>
+              </ul>
+            </div>
+
+            <div className="footer-col">
+              <h4>Conformidade Legal</h4>
+              <p style={{ fontSize: "0.85rem", color: "var(--clr-text-muted)", marginBottom: "0.5rem" }}>
+                <strong>CROWN TECH LTDA</strong>
+              </p>
+              <p style={{ fontSize: "0.85rem", color: "var(--clr-accent-gold)", marginBottom: "1rem" }}>
+                CNPJ: 65.586.793/0001-18
+              </p>
+              <Link href="/admin" className="btn btn-outline btn-sm">
+                Acessar Portal Admin
+              </Link>
+            </div>
           </div>
 
-          <div className="footer-links">
-            <h4>Navegação</h4>
-            <ul>
-              <li><a href="#home">Início</a></li>
-              <li><a href="#servicos">Nossos Serviços</a></li>
-              <li><a href="#produtos">Nossos Produtos</a></li>
-              <li><a href="#sobre">Sobre a Empresa</a></li>
-              <li><a href="#contato">Fale Conosco</a></li>
-            </ul>
+          <div className="footer-bottom">
+            <p>&copy; {new Date().getFullYear()} Crown Tech Ltda — CNPJ 65.586.793/0001-18. Todos os direitos reservados.</p>
+            <p>Engenharia de Software &amp; Soluções de TI Corporativas</p>
           </div>
-
-          <div className="footer-legal">
-            <h4>Informações Legais</h4>
-            <p><strong>CROWN TECH LTDA</strong></p>
-            <p className="cnpj-line">
-              CNPJ: <strong>65.586.793/0001-18</strong>
-            </p>
-            <p style={{ marginTop: "0.75rem" }}>
-              Contrato Social e demais documentos disponíveis fisicamente na sede
-              da empresa para auditorias e fins de conformidade.
-            </p>
-            <p style={{ marginTop: "0.5rem" }}>
-              <a
-                href="mailto:contato@crowntech.com.br"
-                style={{ color: "#93C5FD" }}
-              >
-                contato@crowntech.com.br
-              </a>
-            </p>
-          </div>
-        </div>
-        <div className="footer-bottom">
-          <p>
-            &copy; 2026 Crown Tech Ltda — CNPJ 65.586.793/0001-18. Todos os
-            direitos reservados.
-          </p>
         </div>
       </footer>
     </>
