@@ -147,20 +147,22 @@ const PRODUCTS = [
   }
 ];
 
-// Interactive Calculator Options
-const CALC_ITEMS = [
-  { id: "soft", label: "Desenvolvimento de Software / App Sob Medida", basePrice: 12000, days: 30 },
-  { id: "cftv", label: "Infraestrutura de Câmeras IP & CFTV Inteligente", basePrice: 4500, days: 7 },
-  { id: "rede", label: "Cabeamento Estruturado & Redes Cat6/Fibra", basePrice: 3800, days: 5 },
-  { id: "hotel", label: "Wi-Fi Corporativo & Portal para Hotelaria/Pousada", basePrice: 5500, days: 10 },
-  { id: "saas", label: "Implantação de SaaS CrownTech (ConformaGov / MyProjectUp / OrganizeUp)", basePrice: 2500, days: 3 }
+// Interactive Diagnostic Tool Options (No prices)
+const DIAGNOSTIC_ITEMS = [
+  { id: "soft", label: "Desenvolvimento de Software / App Web Sob Medida", tag: "Engenharia de Software", days: 30 },
+  { id: "cftv", label: "Câmeras IP, Monitoramento Inteligente & CFTV", tag: "Segurança Física", days: 7 },
+  { id: "rede", label: "Cabeamento Estruturado & Redes Cat6/Fibra", tag: "Infraestrutura TI", days: 5 },
+  { id: "hotel", label: "Wi-Fi Corporativo de Alta Densidade (Hotelaria / Pousadas)", tag: "Conectividade Premium", days: 10 },
+  { id: "saas_gov", label: "Gestão Pública, Licitações & Compliance Regulatório (ConformaGov)", tag: "GovTech", days: 3 },
+  { id: "saas_gestao", label: "Gestão de Projetos & Finanças Corporativas (MyProjectUp / OrganizeUp)", tag: "SaaS Produtividade", days: 2 },
+  { id: "saas_food", label: "Cardápio Digital & Autoatendimento para Restaurantes (Menuri)", tag: "FoodTech", days: 1 }
 ];
 
 export default function Home() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [productCategory, setProductCategory] = useState("all");
-  const [selectedCalcItems, setSelectedCalcItems] = useState(["soft", "saas"]);
+  const [selectedDiagItems, setSelectedDiagItems] = useState(["soft", "saas_gestao"]);
   const [leadForm, setLeadForm] = useState({ name: "", email: "", phone: "", service: "Desenvolvimento de Software", msg: "" });
   const [formSubmitted, setFormSubmitted] = useState(false);
 
@@ -176,21 +178,16 @@ export default function Home() {
     ? PRODUCTS 
     : PRODUCTS.filter(p => p.category === productCategory);
 
-  const toggleCalcItem = (id) => {
-    if (selectedCalcItems.includes(id)) {
-      setSelectedCalcItems(selectedCalcItems.filter(i => i !== id));
+  const toggleDiagItem = (id) => {
+    if (selectedDiagItems.includes(id)) {
+      setSelectedDiagItems(selectedDiagItems.filter(i => i !== id));
     } else {
-      setSelectedCalcItems([...selectedCalcItems, id]);
+      setSelectedDiagItems([...selectedDiagItems, id]);
     }
   };
 
-  const calcTotalCost = selectedCalcItems.reduce((acc, itemId) => {
-    const found = CALC_ITEMS.find(c => c.id === itemId);
-    return acc + (found ? found.basePrice : 0);
-  }, 0);
-
-  const calcTotalDays = Math.max(...selectedCalcItems.map(itemId => {
-    const found = CALC_ITEMS.find(c => c.id === itemId);
+  const calcTotalDays = Math.max(...selectedDiagItems.map(itemId => {
+    const found = DIAGNOSTIC_ITEMS.find(c => c.id === itemId);
     return found ? found.days : 0;
   }), 0);
 
@@ -201,7 +198,7 @@ export default function Home() {
   };
 
   const generateWhatsAppLink = () => {
-    const text = `Olá CrownTech! Gostaria de solicitar um orçamento para:\nServiço: ${leadForm.service}\nNome: ${leadForm.name}\nContato: ${leadForm.email} / ${leadForm.phone}\nMensagem: ${leadForm.msg}`;
+    const text = `Olá CrownTech! Gostaria de agendar uma consultoria / demonstração técnica para:\nServiço: ${leadForm.service}\nNome: ${leadForm.name}\nContato: ${leadForm.email} / ${leadForm.phone}\nMensagem: ${leadForm.msg}`;
     return `https://wa.me/5531999999999?text=${encodeURIComponent(text)}`;
   };
 
@@ -229,7 +226,7 @@ export default function Home() {
               <li><a href="#home" className="nav-link" onClick={() => setMobileMenuOpen(false)}>Início</a></li>
               <li><a href="#produtos" className="nav-link" onClick={() => setMobileMenuOpen(false)}>Ecossistema SaaS</a></li>
               <li><a href="#servicos" className="nav-link" onClick={() => setMobileMenuOpen(false)}>Serviços Corporativos</a></li>
-              <li><a href="#orcamento" className="nav-link" onClick={() => setMobileMenuOpen(false)}>Simulador ROI</a></li>
+              <li><a href="#diagnostico" className="nav-link" onClick={() => setMobileMenuOpen(false)}>Diagnóstico Tecnológico</a></li>
               <li><a href="#sobre" className="nav-link" onClick={() => setMobileMenuOpen(false)}>Sobre</a></li>
               <li><a href="#contato" className="nav-link" onClick={() => setMobileMenuOpen(false)}>Contato</a></li>
             </ul>
@@ -293,8 +290,8 @@ export default function Home() {
                       <polyline points="12 5 19 12 12 19"></polyline>
                     </svg>
                   </a>
-                  <a href="#orcamento" className="btn btn-gold btn-lg">
-                    Simular Investimento
+                  <a href="#diagnostico" className="btn btn-gold btn-lg">
+                    Diagnóstico Tecnológico
                   </a>
                 </div>
 
@@ -534,28 +531,28 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Interactive Budget / Project ROI Calculator */}
-        <section className="section section-bg-alt" id="orcamento">
+        {/* Interactive Solution Architect / Project Diagnostic Tool */}
+        <section className="section section-bg-alt" id="diagnostico">
           <div className="container">
             <div className="section-header text-center">
-              <span className="section-subtitle">Simulador de Investimento</span>
-              <h2 className="section-title">Estime o Valor do Seu Projeto Corporativo</h2>
+              <span className="section-subtitle">Diagnóstico Tecnológico Interativo</span>
+              <h2 className="section-title">Monte a Solução Ideal para o Seu Negócio</h2>
               <p className="section-description">
-                Selecione as soluções desejadas para visualizar uma estimativa transparente de investimento e prazo médio de entrega pela equipe CrownTech.
+                Selecione os objetivos da sua empresa e descubra a combinação recomendada de ecossistema tecnológico e tempo estimado de implantação.
               </p>
             </div>
 
             <div className="calc-wrapper">
               <div className="calc-grid">
                 <div className="calc-options">
-                  <h4 style={{ fontSize: "1.2rem", marginBottom: "0.5rem", color: "#FFF" }}>Selecione os Serviços ou Produtos:</h4>
-                  {CALC_ITEMS.map((item) => {
-                    const isSelected = selectedCalcItems.includes(item.id);
+                  <h4 style={{ fontSize: "1.2rem", marginBottom: "0.5rem", color: "#FFF" }}>Selecione as Necessidades da Sua Operação:</h4>
+                  {DIAGNOSTIC_ITEMS.map((item) => {
+                    const isSelected = selectedDiagItems.includes(item.id);
                     return (
                       <div 
                         key={item.id} 
                         className={`calc-option-item ${isSelected ? "selected" : ""}`}
-                        onClick={() => toggleCalcItem(item.id)}
+                        onClick={() => toggleDiagItem(item.id)}
                       >
                         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
                           <div className="chk-box">
@@ -567,12 +564,12 @@ export default function Home() {
                           </div>
                           <div>
                             <strong style={{ display: "block", fontSize: "0.95rem" }}>{item.label}</strong>
-                            <span style={{ fontSize: "0.825rem", color: "var(--clr-text-muted)" }}>Prazo estimado: ~{item.days} dias</span>
+                            <span style={{ fontSize: "0.825rem", color: "var(--clr-text-muted)" }}>Prazo estimado de entrega: ~{item.days} {item.days === 1 ? "dia útil" : "dias úteis"}</span>
                           </div>
                         </div>
 
-                        <span style={{ fontWeight: 700, color: "var(--clr-accent-cyan)" }}>
-                          R$ {item.basePrice.toLocaleString('pt-BR')}
+                        <span className="badge badge-primary" style={{ fontSize: "0.75rem" }}>
+                          {item.tag}
                         </span>
                       </div>
                     );
@@ -580,16 +577,28 @@ export default function Home() {
                 </div>
 
                 <div className="calc-summary-card">
-                  <span className="badge badge-gold">Estimativa Transparente</span>
-                  <h3 style={{ marginTop: "1rem", fontSize: "1.3rem" }}>Investimento Estimado</h3>
+                  <span className="badge badge-gold">Diagnóstico sob Medida</span>
+                  <h3 style={{ marginTop: "1rem", fontSize: "1.3rem" }}>Arquitetura Recomendada</h3>
                   
-                  <div className="calc-total">
-                    R$ {calcTotalCost.toLocaleString('pt-BR')},00
+                  <div style={{ fontSize: "2rem", fontWeight: 800, color: "var(--clr-accent-cyan)", margin: "1rem 0" }}>
+                    {selectedDiagItems.length} {selectedDiagItems.length === 1 ? "Módulo Selecionado" : "Módulos Selecionados"}
                   </div>
 
-                  <p style={{ fontSize: "0.9rem", color: "var(--clr-text-muted)", marginBottom: "1.75rem" }}>
-                    Prazo total de execução estimado: <strong>~{calcTotalDays} dias úteis</strong>. <br />
-                    Parcelamento facilitado e contratos faturados para CNPJ.
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginBottom: "1.5rem", textAlign: "left" }}>
+                    {selectedDiagItems.map((id) => {
+                      const item = DIAGNOSTIC_ITEMS.find(d => d.id === id);
+                      return item ? (
+                        <div key={id} style={{ fontSize: "0.85rem", color: "var(--clr-text)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                          <span style={{ color: "var(--clr-accent-emerald)" }}>✓</span>
+                          <span>{item.label}</span>
+                        </div>
+                      ) : null;
+                    })}
+                  </div>
+
+                  <p style={{ fontSize: "0.875rem", color: "var(--clr-text-muted)", marginBottom: "1.75rem" }}>
+                    Prazo estimado total para implantação: <strong>~{calcTotalDays} dias úteis</strong>. <br />
+                    Atendimento corporativo com suporte dedicado CrownTech.
                   </p>
 
                   <a 
@@ -597,7 +606,7 @@ export default function Home() {
                     className="btn btn-gold btn-lg"
                     style={{ width: "100%" }}
                   >
-                    Solicitar Proposta Formal
+                    Agendar Demonstração / Consultoria Gratuita
                   </a>
                 </div>
               </div>
@@ -732,7 +741,7 @@ export default function Home() {
                   </div>
                 ) : (
                   <form onSubmit={handleLeadSubmit}>
-                    <h3 style={{ fontSize: "1.3rem", marginBottom: "1.25rem" }}>Solicitar Proposta Comercial</h3>
+                    <h3 style={{ fontSize: "1.3rem", marginBottom: "1.25rem" }}>Solicitar Atendimento Técnico</h3>
 
                     <div className="form-group">
                       <label className="form-label">Nome Completo</label>
@@ -797,7 +806,7 @@ export default function Home() {
                     </div>
 
                     <button type="submit" className="btn btn-primary btn-lg" style={{ width: "100%" }}>
-                      Enviar Solicitação de Orçamento
+                      Enviar Solicitação
                     </button>
                   </form>
                 )}
@@ -830,7 +839,7 @@ export default function Home() {
                 <li><a href="#home">Início</a></li>
                 <li><a href="#produtos">Ecossistema SaaS</a></li>
                 <li><a href="#servicos">Serviços Corporativos</a></li>
-                <li><a href="#orcamento">Simulador ROI</a></li>
+                <li><a href="#diagnostico">Diagnóstico Tecnológico</a></li>
                 <li><a href="#sobre">Sobre a Empresa</a></li>
               </ul>
             </div>
