@@ -5,6 +5,11 @@ import Image from "next/image";
 import Link from "next/link";
 
 // CrownTech Product Ecosystem Data
+// Contato oficial. WhatsApp só aparece se houver número real configurado no build
+// (NEXT_PUBLIC_WHATSAPP_NUMBER, só dígitos com DDI: 55DDDNUMERO).
+const CONTACT_EMAIL = "contato@crowntech.com.br";
+const WHATSAPP_NUMBER = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "").replace(/\D/g, "");
+
 const PRODUCTS = [
   {
     id: "tomaalista",
@@ -88,7 +93,7 @@ const PRODUCTS = [
       "Adequação rigorosa a normas públicas",
       "Auditoria automatizada de processos",
       "Portal da transparência e relatórios legais",
-      "Segurança de dados padrão militar/LGPD"
+      "Boas práticas de segurança e LGPD"
     ],
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -191,16 +196,20 @@ export default function Home() {
     return found ? found.days : 0;
   }), 0);
 
+  // O site não guarda nem envia dados: o formulário só monta a mensagem e abre o e-mail do
+  // próprio visitante, que decide enviar para o endereço oficial.
+  const leadMessage = () =>
+    `Olá CrownTech! Gostaria de atendimento para:\nServiço: ${leadForm.service}\nNome: ${leadForm.name}\nContato: ${leadForm.email} / ${leadForm.phone}\nMensagem: ${leadForm.msg}`;
+
   const handleLeadSubmit = (e) => {
     e.preventDefault();
+    const subject = encodeURIComponent(`Solicitação de atendimento — ${leadForm.service}`);
+    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${encodeURIComponent(leadMessage())}`;
     setFormSubmitted(true);
-    setTimeout(() => setFormSubmitted(false), 6000);
   };
 
-  const generateWhatsAppLink = () => {
-    const text = `Olá CrownTech! Gostaria de agendar uma consultoria / demonstração técnica para:\nServiço: ${leadForm.service}\nNome: ${leadForm.name}\nContato: ${leadForm.email} / ${leadForm.phone}\nMensagem: ${leadForm.msg}`;
-    return `https://wa.me/5531999999999?text=${encodeURIComponent(text)}`;
-  };
+  const generateWhatsAppLink = () =>
+    `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(leadMessage())}`;
 
   return (
     <>
@@ -233,15 +242,6 @@ export default function Home() {
           </nav>
 
           <div className="nav-actions">
-            <Link href="/admin" className="btn btn-outline btn-sm">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="3" width="7" height="7"></rect>
-                <rect x="14" y="3" width="7" height="7"></rect>
-                <rect x="14" y="14" width="7" height="7"></rect>
-                <rect x="3" y="14" width="7" height="7"></rect>
-              </svg>
-              Área Admin
-            </Link>
             <a href="#contato" className="btn btn-primary btn-sm">
               Fale Conosco
             </a>
@@ -269,7 +269,7 @@ export default function Home() {
               <div>
                 <div className="hero-eyebrow">
                   <span className="badge badge-gold">Empresa de Tecnologia &amp; Inovação</span>
-                  <span className="badge badge-live">SLA 99.9% Garantido</span>
+                  <span className="badge badge-live">Monitoramento contínuo</span>
                 </div>
                 
                 <h1 className="hero-title">
@@ -301,8 +301,8 @@ export default function Home() {
                     <div className="kpi-label">Plataformas SaaS Propriedade CrownTech</div>
                   </div>
                   <div className="kpi-card">
-                    <div className="kpi-val">100%</div>
-                    <div className="kpi-label">Projetos Entregues no Prazo</div>
+                    <div className="kpi-val">BR</div>
+                    <div className="kpi-label">Atendimento em todo o Brasil</div>
                   </div>
                   <div className="kpi-card">
                     <div className="kpi-val">24/7</div>
@@ -369,8 +369,8 @@ export default function Home() {
               <div className="trust-item">
                 <div className="trust-icon">🤝</div>
                 <div>
-                  <strong style={{ display: "block", fontSize: "0.95rem" }}>Contratos Oficiais</strong>
-                  <span style={{ fontSize: "0.85rem", color: "var(--clr-text-muted)" }}>Garantia por SLA legal</span>
+                  <strong style={{ display: "block", fontSize: "0.95rem" }}>Contratos Formais</strong>
+                  <span style={{ fontSize: "0.85rem", color: "var(--clr-text-muted)" }}>Escopo e prazos acordados por contrato</span>
                 </div>
               </div>
             </div>
@@ -680,7 +680,7 @@ export default function Home() {
               <span className="section-subtitle">Atendimento Executivo</span>
               <h2 className="section-title">Entre em Contato com a Nossa Equipe</h2>
               <p className="section-description">
-                Estamos prontos para atender a sua empresa. Envie um e-mail ou inicie uma conversa direta via WhatsApp para receber uma proposta personalizada.
+                Estamos prontos para atender a sua empresa. Envie um e-mail para receber uma proposta personalizada.
               </p>
             </div>
 
@@ -696,7 +696,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="contact-card-item">
+                {WHATSAPP_NUMBER && (<div className="contact-card-item">
                   <div className="trust-icon">💬</div>
                   <div>
                     <span style={{ fontSize: "0.8rem", color: "var(--clr-text-muted)" }}>WhatsApp Corporativo</span>
@@ -704,7 +704,7 @@ export default function Home() {
                       Atendimento Direto &amp; Orçamentos
                     </strong>
                   </div>
-                </div>
+                </div>)}
 
                 <div className="contact-card-item">
                   <div className="trust-icon">🏢</div>
@@ -716,7 +716,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div style={{ marginTop: "1rem" }}>
+                {WHATSAPP_NUMBER && (<div style={{ marginTop: "1rem" }}>
                   <a 
                     href={generateWhatsAppLink()} 
                     target="_blank" 
@@ -726,7 +726,7 @@ export default function Home() {
                   >
                     Falar via WhatsApp Agora
                   </a>
-                </div>
+                </div>)}
               </div>
 
               {/* Lead Form */}
@@ -734,9 +734,10 @@ export default function Home() {
                 {formSubmitted ? (
                   <div style={{ textAlign: "center", padding: "2rem 0" }}>
                     <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🎉</div>
-                    <h3 style={{ fontSize: "1.5rem", marginBottom: "0.5rem" }}>Mensagem Enviada!</h3>
+                    <h3 style={{ fontSize: "1.5rem", marginBottom: "0.5rem" }}>Mensagem pronta!</h3>
                     <p style={{ color: "var(--clr-text-muted)" }}>
-                      Obrigado pelo contato! Nossa equipe técnica retornará a sua solicitação em até 2 horas úteis.
+                      Abrimos o seu aplicativo de e-mail com a mensagem para {CONTACT_EMAIL}. Confira e envie por lá.
+                      Se ele não abriu, escreva direto para <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
                     </p>
                   </div>
                 ) : (
@@ -805,8 +806,12 @@ export default function Home() {
                       ></textarea>
                     </div>
 
+                    <p style={{ fontSize: "0.8rem", color: "var(--clr-text-muted)", marginBottom: "0.75rem" }}>
+                      Este site não armazena seus dados: o botão abre o seu e-mail com a mensagem pronta para{" "}
+                      {CONTACT_EMAIL}. Veja a nossa <Link href="/privacidade">Política de Privacidade</Link>.
+                    </p>
                     <button type="submit" className="btn btn-primary btn-lg" style={{ width: "100%" }}>
-                      Enviar Solicitação
+                      Enviar por e-mail
                     </button>
                   </form>
                 )}
@@ -864,9 +869,7 @@ export default function Home() {
               <p style={{ fontSize: "0.85rem", color: "var(--clr-accent-gold)", marginBottom: "1rem" }}>
                 CNPJ: 65.586.793/0001-18
               </p>
-              <Link href="/admin" className="btn btn-outline btn-sm">
-                Acessar Portal Admin
-              </Link>
+              <Link href="/privacidade" className="nav-link">Política de Privacidade</Link>
             </div>
           </div>
 
