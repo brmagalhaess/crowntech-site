@@ -1,6 +1,6 @@
-# Deploy no servidor do Império de Bolso (Dokploy em 169.58.235.246). Lá quem atende 80/443 é o
-# nginx-proxy (jwilder) + acme-companion: o container entra na rede "nginx-proxy" e ganha HTTPS
-# pelo VIRTUAL_HOST/LETSENCRYPT_HOST. O docker-compose.yml continua sendo o da VPS antiga.
+# Deploy no servidor do Império de Bolso (Dokploy em 169.58.235.246). Lá a entrada 80/443 é o
+# Traefik do Dokploy: os domínios (www.crowntech.com.br e crowntech.com.br → porta 3000, HTTPS
+# Let's Encrypt) ficam na aba Domains do serviço. O docker-compose.yml continua o da VPS antiga.
 services:
   crowntech-site:
     build:
@@ -12,20 +12,10 @@ services:
     restart: unless-stopped
     environment:
       PORT: "3000"
-      VIRTUAL_HOST: ${SITE_DOMAINS:-www.crowntech.com.br,crowntech.com.br}
-      VIRTUAL_PORT: "3000"
-      LETSENCRYPT_HOST: ${SITE_DOMAINS:-www.crowntech.com.br,crowntech.com.br}
     expose:
       - "3000"
-    networks:
-      - proxy
     deploy:
       resources:
         limits:
           cpus: "0.25"
           memory: 256M
-
-networks:
-  proxy:
-    external: true
-    name: ${PROXY_NETWORK:-nginx-proxy}
