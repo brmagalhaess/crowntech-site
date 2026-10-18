@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Servidor mínimo em .next/standalone (usado pelo Dockerfile multi-stage).
+  output: "standalone",
   poweredByHeader: false,
   // Um único endereço oficial: crowntech.com.br → www.crowntech.com.br.
   async redirects() {
