@@ -80,7 +80,7 @@ export const PRODUCTS = [
     domain: "mycartao.com.br",
     summary:
       "Cartão de presença digital: um link com foto, contatos, portfólio e QR Code. Você atualiza uma vez e ele fica certo em todo lugar onde foi compartilhado.",
-    points: ["Plano Free e plano Pro", "QR Code e PDF para impressão"],
+    points: ["Plano Free e plano Pro", "QR Code e salvar contato (vCard)"],
   },
   {
     id: "myprojectup",

@@ -1057,8 +1057,15 @@ a:hover {
   font-size: 0.9375rem;
 }
 
+/* Vazio, o aviso fica fora do fluxo mas continua na árvore de acessibilidade,
+   para o leitor de tela anunciar a mensagem quando ela aparecer. */
 .form-status:empty {
-  display: none;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 /* ---------- Rodapé ---------- */

@@ -63,7 +63,7 @@ export default function SiteFooter() {
       </div>
       <div className="wrap footer-bottom">
         <p>
-          © {new Date().getFullYear()} {COMPANY.legalName} · CNPJ {COMPANY.cnpj}
+          © {COMPANY.legalName} · CNPJ {COMPANY.cnpj}
         </p>
       </div>
     </footer>

@@ -220,7 +220,7 @@ export default function Home() {
                   </span>
                   <div>
                     <h3>
-                      <span className="service-num">{String(index + 1).padStart(2, "0")}</span>
+                      <span className="service-num" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
                       {service.title}
                     </h3>
                     <p>{service.text}</p>
